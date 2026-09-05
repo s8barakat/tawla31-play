@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Tawla 31</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #29180f; overflow: hidden; }
+    #wrap { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+    #unity-canvas { background: #29180f; display: block; touch-action: none; }
+    #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #f5eddb; font: 18px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; text-align: center; pointer-events: none; }
+    #bar { width: 60%; max-width: 320px; height: 8px; background: #4a3020; border-radius: 4px; margin-top: 12px; overflow: hidden; }
+    #fill { height: 100%; width: 0; background: #dba03a; transition: width .2s; }
+    #note { margin-top: 24px; font-size: 13px; opacity: .7; max-width: 320px; }
+  </style>
+</head>
+<body>
+  <div id="wrap"><canvas id="unity-canvas" tabindex="-1"></canvas></div>
+  <div id="loading">
+    <div>Tawla 31 &nbsp;|&nbsp; طاولة ٣١</div>
+    <div id="bar"><div id="fill"></div></div>
+    <div id="note">Development build for play-testing. Best in portrait on a phone, or a tall browser window.</div>
+  </div>
+  <script src="Build/webgl.loader.js"></script>
+  <script>
+    const canvas = document.querySelector("#unity-canvas");
+    const loading = document.querySelector("#loading");
+    const fill = document.querySelector("#fill");
+
+    function fit() {
+      // Portrait phone aspect (9:19.5) fitted inside the viewport; wide screens get a tall column.
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const aspect = 9 / 19.5;
+      let h = vh, w = Math.round(h * aspect);
+      if (w > vw) { w = vw; h = Math.round(w / aspect); }
+      if (vw < 700) { w = vw; h = vh; } // on phones simply fill the screen
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+    }
+    window.addEventListener("resize", fit);
+    fit();
+
+    const config = {
+      arguments: [],
+      dataUrl: "Build/webgl.data.unityweb",
+      frameworkUrl: "Build/webgl.framework.js.unityweb",
+      codeUrl: "Build/webgl.wasm.unityweb",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "Tawla 31",
+      productName: "Tawla 31",
+      productVersion: "0.2.0",
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
+    };
+
+    createUnityInstance(canvas, config, (progress) => {
+      fill.style.width = Math.round(progress * 100) + "%";
+    }).then((instance) => {
+      loading.style.display = "none";
+    }).catch((message) => {
+      document.querySelector("#note").textContent = "Could not start: " + message;
+    });
+  </script>
+</body>
+</html>
